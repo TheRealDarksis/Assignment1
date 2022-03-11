@@ -31,8 +31,8 @@ Pscatter = 1 - exp(-dt/tau_mn);     % Scattering probability
 
 % Initializing positions and velocities 
     y(:,1) = rand(elecpop,1)*L;
-    vx = Vth*randn(elecpop,1);
-    vy = Vth*randn(elecpop,1); 
+    vx = Vth*randn(elecpop,1)/sqrt(2);
+    vy = Vth*randn(elecpop,1)/sqrt(2); 
     for z = 1:elecpop   % Generating points on the left side
        x(z,1) = 0.2e-7 + (0.8e-7 - 0.2e-7)*rand();
     end
@@ -62,10 +62,9 @@ circle = [circx,circy];
         %Code for trajectory and collision
         oldx = x;
         oldy = y;
-        if Pscatter > rand()
-            vx = Vth*randn(elecpop,1);
-            vy = Vth*randn(elecpop,1); 
-        end       
+        PartScatter = Pscatter > rand(elecpop,1);
+            vx(PartScatter) = Vth*randn(sum(PartScatter),1)/sqrt(2);
+            vy(PartScatter) = Vth*randn(sum(PartScatter),1)/sqrt(2);     
         x = oldx + vx*dt;  % Previous x position + delta L
         y = oldy + vy*dt;  % Previous y position + delta L    
         oldx(x<0) = W;  % Making the particles on the left boundary, appear on the right
@@ -84,34 +83,33 @@ circle = [circx,circy];
             plot([oldx(samp(m)), x(samp(m))],[oldy(samp(m)),y(samp(m))],'SeriesIndex',m)
             axis([0 200e-9 0 100e-9])
             hold on 
-            SampVx(m) = vx(samp(m));    % To calculate T
-            SampVy(m) = vy(samp(m));
-            SampV(m) = sqrt( SampVx(m)^2+SampVy(m)^2 );
-            NewT(m) = SampV(m)^2*mn/(2*k*T);  
         end
+            V = mean( sqrt( vx.^2+vy.^2 ) );
+            NewT = V.^2*mn/(2*k);  
+            figure(3)% Plotting T
+            plot(j,NewT,'o')
+            hold on
+            title('Temperature at random points')
+            xlabel('random occurence')
+            ylabel('Temperature')
         pause(0.01)
     end
-figure   % Plotting T
-plot(1:samplepop,NewT)
-title('Temperature at random points')
-xlabel('random occurence')
-ylabel('Temperature')
 
 % Plotting electron density maps
-figure
-hist3([x(:), y(:)],'CDataMode','auto')
-title('Electron density map, rotate to get top view')
-
-figure
-grid = 256;   %refinement of map
-minvals = min(x);
-maxvals = max(x);
-minvals2 = min(y);
-maxvals2 = max(y);
-rangevals = maxvals - minvals;
-rangevals2 = maxvals2 - minvals2;
-xidx = 1 + round((x(:,1) - minvals(1)) ./ rangevals(1) * (grid-1));
-yidx = 1 + round((y(:,1) - minvals2(1)) ./ rangevals2(1) * (grid-1));
-density = accumarray([yidx, xidx], 1, [grid,grid]);  %note y is rows, x is cols
-imagesc(density, 'xdata', [minvals(1), maxvals(1)], 'ydata', [minvals2(1), maxvals2(1)]);
-title('Electron density map')
+% figure
+% hist3([x(:), y(:)],'CDataMode','auto')
+% title('Electron density map, rotate to get top view')
+% 
+% figure
+% grid = 256;   %refinement of map
+% minvals = min(x);
+% maxvals = max(x);
+% minvals2 = min(y);
+% maxvals2 = max(y);
+% rangevals = maxvals - minvals;
+% rangevals2 = maxvals2 - minvals2;
+% xidx = 1 + round((x(:,1) - minvals(1)) ./ rangevals(1) * (grid-1));
+% yidx = 1 + round((y(:,1) - minvals2(1)) ./ rangevals2(1) * (grid-1));
+% density = accumarray([yidx, xidx], 1, [grid,grid]);  %note y is rows, x is cols
+% imagesc(density, 'xdata', [minvals(1), maxvals(1)], 'ydata', [minvals2(1), maxvals2(1)]);
+% title('Electron density map')
