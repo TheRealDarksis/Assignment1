@@ -26,9 +26,7 @@ vy = zeros(elecpop,1);              % Electron y direction velocity
 dt = 1e-14;                         % Time step in s
 samplepop = 7;                      % # of electrons to observe
 samp = randi(elecpop,samplepop,1);  % Random selection of particles
-SampVx = zeros(7,1);                % Vector to calculate T later
-SampVy = zeros(7,1);                % Vector to calculate T later
-SampV = zeros(7,1);                 % Vector to calculate T later
+
 
 % For Q1, thermal velocity
 Vth = sqrt(2*k*T/mn);   % Thermal velocity in m/s
@@ -50,30 +48,32 @@ vy(:,1) = Vth*sin(phi(:,1));
         oldx = x;
         oldy = y;
         x = oldx + vx*dt;       % Previous x position + delta L
-        y = oldy + vy*dt;       % Previous y position + delta L
+        y = oldy + vy*dt;       % Previous y position + delta L    
         oldx(x<0) = W;          % Making the particles on the left boundary, appear on the right
         oldx(x>W) = 0;          % Making the particles on the right boundary, appear on the left
         x(x<0) = x(x<0) + W;    % All points passed the left get pushed to the other side
         x(x>W) = x(x>W) - W;    % All points passed the right get pushed to the other side
         vy(y>L) = -vy(y>L);     % Particle Y direction gets flipped if it hits the top
-        vy(y<0) = -vy(y<0);     % Particle Y direction gets flipped if it hits the bottom
+        vy(y<0) = -vy(y<0);     % Particle Y direction gets flipped
         for m = 1:samplepop     % For plotting
             figure(1)
             plot([oldx(samp(m)), x(samp(m))],[oldy(samp(m)),y(samp(m))],'SeriesIndex',m)
+            title('Sample Particles Trajectories')
+            xlabel('W (m) or x position')
+            ylabel('L (m) or y position')
             axis([0 200e-9 0 100e-9])
-            hold on
-            SampVx(m) = vx(samp(m));    % To calculate T
-            SampVy(m) = vy(samp(m));
-            SampV(m) = sqrt( SampVx(m)^2+SampVy(m)^2 );
-            NewT(m) = SampV(m)^2*mn/(2*k*T);            
+            hold on       
         end
+        V = mean( sqrt( vx.^2+vy.^2 ) );
+        NewT = V.^2*mn/(2*k);  
+        figure(3)% Plotting T
+        plot(j,NewT,'o')
+        hold on
+        title('Temperature at random points')
+        xlabel('random occurence')
+        ylabel('Temperature (K)')  
         pause(0.01)
     end
-    figure(2)   % Plotting T
-    plot(1:7,NewT)
-    title('Temperature at random points')
-    xlabel('random occurence')
-    ylabel('Temperature')
     
 
 

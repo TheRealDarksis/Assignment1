@@ -98,9 +98,9 @@ circle = [circx,circy];
         pause(0.01)
     end
 
-Plotting electron density maps
-figure
-hist3([x(:), y(:)],'CDataMode','auto')
-xlabel('W (m) or x position')
-ylabel('L (m) or y position')
-title('Electron density map, rotate to get top view')
+% Plotting electron density maps
+% figure
+% hist3([x(:), y(:)],'CDataMode','auto')
+% xlabel('W (m) or x position')
+% ylabel('L (m) or y position')
+% title('Electron density map, rotate to get top view')
