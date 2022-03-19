@@ -75,26 +75,20 @@ circle = [circx,circy];
         vy(y<0) = -vy(y<0);     % Particle Y direction gets flipped
         figure(2)        
         circle2(0,0.5e-7,0.2e-7);   % Plotting circle
-        for m = 1:samplepop
-            for a = 1:2
-                rectangle('Position',[Boxes{a}.X(1), Boxes{a}.Y(1), Boxes{a}.X(2), Boxes{a}.Y(2)])
-                axis([0 W 0 L])
-            end            
-            plot([oldx(samp(m)), x(samp(m))],[oldy(samp(m)),y(samp(m))],'SeriesIndex',m)
-            title('Sample Particles Trajectories')
-            xlabel('W (m) or x position')
-            ylabel('L (m) or y position')
-            axis([0 200e-9 0 100e-9])
-            hold on 
-        end
+%         for m = 1:samplepop
+%             for a = 1:2
+%                 rectangle('Position',[Boxes{a}.X(1), Boxes{a}.Y(1), Boxes{a}.X(2), Boxes{a}.Y(2)])
+%                 axis([0 W 0 L])
+%             end            
+%             plot([oldx(samp(m)), x(samp(m))],[oldy(samp(m)),y(samp(m))],'SeriesIndex',m)
+%             title('Sample Particles Trajectories')
+%             xlabel('W (m) or x position')
+%             ylabel('L (m) or y position')
+%             axis([0 200e-9 0 100e-9])
+%             hold on 
+%         end
             V = mean( sqrt( vx.^2+vy.^2 ) );
-            NewT = V.^2*mn/(2*k);  
-            figure(3)% Plotting T
-            plot(j,NewT,'o')
-            hold on
-            title('Temperature at random points')
-            xlabel('random occurence')
-            ylabel('Temperature (K)')
+            NewT(j) = V.^2*mn/(2*k);  
         pause(0.01)
     end
 
@@ -103,4 +97,18 @@ circle = [circx,circy];
 % hist3([x(:), y(:)],'CDataMode','auto')
 % xlabel('W (m) or x position')
 % ylabel('L (m) or y position')
-% title('Electron density map, rotate to get top view')
+% title('Electron density map')
+
+%temp map!!!!
+BinX = x*nx/W;
+BinY = y*ny/L;
+for i = 1:nx
+    for j = 1:ny
+        match = BinX == i & BinY == j;
+        Tbox(i,j) = V(match);
+    end
+end
+surface(Tbox)
+title('Temperature Density')
+xlabel('')
+ylabel('Temperature (K)')
